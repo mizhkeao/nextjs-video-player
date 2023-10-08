@@ -30,7 +30,7 @@ export default function Home({ allPostsData }) {
 			</section>
 
 			<section>
-				<VideoPlayer src='assets/React in 100 Seconds.mp4'></VideoPlayer>
+				<VideoPlayer src='assets/React in 100 Seconds.mp4' sub='assets/React in 100 Seconds.vtt'></VideoPlayer>
 			</section>
 
 			<section className={`${utilStyles.headingMd} ${utilStyles.padding1px}`}>

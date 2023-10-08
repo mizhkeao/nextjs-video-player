@@ -3,11 +3,11 @@ import { BsFillPlayFill, BsFillPauseFill  } from 'react-icons/bs'
 import { MdOutlinePanoramaWideAngle, MdOutlinePanoramaWideAngleSelect  } from 'react-icons/md'
 import { RiFullscreenExitLine, RiFullscreenFill  } from 'react-icons/ri'
 import { TbPictureInPictureOff, TbPictureInPictureOn } from 'react-icons/tb'
+import { BiCaptions, BiSolidCaptions } from 'react-icons/bi'
 import { useState, useRef, useEffect } from 'react'
 import Volume from './volume'
-import { set } from 'date-fns'
 
-export default function VideoPlayer({ src }) {
+export default function VideoPlayer({ src, sub }) {
 
 	const [playing, setPlaying] = useState(false)
 	const [pictureInPicture, setPictureInPicture] = useState(false)
@@ -15,12 +15,13 @@ export default function VideoPlayer({ src }) {
 	const [fullscreen, setFullscreen] = useState(false)
 	const [volume, setVolume] = useState(1.0)
 	const [muted, setMuted] = useState(false)
+	const [cc, setCC] = useState(false)
 
 	const video = useRef(null)
 	const videoContainer = useRef(null)
 
-	const [videoCurrentTime, setVideoCurrentTime] = useState('0:00')
-	const [videoTotalTime, setVideoTotalTime] = useState('0:00')
+	const [videoCurrentTime, setVideoCurrentTime] = useState("0:00")
+	const [videoTotalTime, setVideoTotalTime] = useState("0:00")
 
 	const togglePlayPause = () => {
 		setPlaying(prev => { return !prev })
@@ -45,7 +46,7 @@ export default function VideoPlayer({ src }) {
 		videoContainer.current.className = !theater ? "video-container theater" : "video-container";
 	}
 
-	const _setFullscreen = (fullscreen) => {
+	const toggleFullscreen = (fullscreen) => {
 		setFullscreen(!fullscreen)
 		if (!fullscreen) {
 			videoContainer.current.requestFullscreen()
@@ -78,13 +79,13 @@ export default function VideoPlayer({ src }) {
 					toggleTheater()
 					break
 				case "f":
-					_setFullscreen(fullscreen)
+					toggleFullscreen(fullscreen)
 					break
 				case "m":
-					ToggleMute()
+					toggleMuted()
 					break
 				case "escape":
-					_setFullscreen(true)
+					toggleFullscreen(true)
 					break
 				case 'j':
 				case "arrowleft":
@@ -94,22 +95,17 @@ export default function VideoPlayer({ src }) {
 				case "arrowright":
 					skipDuration(5)
 					break
+				case 'c':
+					toggleCaptions()
+					break
 			}
 		}
 		// console.log('add keydownEvents')
 		document.addEventListener("keydown", keydownEvents)
 
-		// const video = document.getElementById("video")
-		// const loadedMetadata = (e) => {
-		// 	console.log('loadedmetadata')
-		// 	setVideoTotalTime(formatDuration(video.duration))
-		// }
-		// video.addEventListener('loadedmetadata', loadedMetadata)
-
 		return () => {
 			// console.log('remove keydownEvents')
 			document.removeEventListener("keydown", keydownEvents)
-			// video.removeEventListener("loadedmetadata", loadedMetadata)
 		}
 	}, [playing, fullscreen, pictureInPicture, theater, muted])
 
@@ -130,7 +126,7 @@ export default function VideoPlayer({ src }) {
 		}
 	}
 
-	const ToggleMute = () => {
+	const toggleMuted = () => {
 		setMuted(!muted)
 		if (!muted) {
 			video.current.volume = 0
@@ -139,10 +135,20 @@ export default function VideoPlayer({ src }) {
 		}
 	}
 
-	const OnVolumeChange = (e) => {
+	const _setVolume = (e) => {
 		setVolume(e.target.value)
 		setMuted(false)
 		video.current.volume = e.target.value
+	}
+
+	const toggleCaptions = () => {
+		setCC(!cc)
+		if (!cc) {
+			video.current.textTracks[0].mode = 'showing'
+		} else {
+			video.current.textTracks[0].mode = 'hidden'
+		}
+		console.log(video.current.textTracks[0])
 	}
 
 	return (
@@ -154,6 +160,16 @@ export default function VideoPlayer({ src }) {
 						{!playing && <BsFillPlayFill aria-hidden="true"/>}
 						{playing && <BsFillPauseFill aria-hidden="true"/>}
 					</button>
+					<Volume ToggleMute={toggleMuted} OnVolumeChange={_setVolume} muted={muted} volume={volume}></Volume>
+					<div className="duration-container">
+						<div className="current-time">{videoCurrentTime}</div>
+						/
+						<div className="total-time">{videoTotalTime}</div>
+					</div>
+					<button className="captions-btn" onClick={ toggleCaptions }>
+						{cc && <BiSolidCaptions aria-hidden="true"/>}
+						{!cc && <BiCaptions aria-hidden="true"/>}
+					</button>
 					<button className="picture-in-picture-btn" onClick={togglePictureInPicture}>
 						{!pictureInPicture && <TbPictureInPictureOn aria-hidden="true"/>}
 						{pictureInPicture && <TbPictureInPictureOff aria-hidden="true"/>}
@@ -162,26 +178,22 @@ export default function VideoPlayer({ src }) {
 						{!theater && <MdOutlinePanoramaWideAngle aria-hidden="true"/>}
 						{theater && <MdOutlinePanoramaWideAngleSelect aria-hidden="true"/>}
 					</button>
-					<button className="fullscreen-btn" onClick={() => _setFullscreen(fullscreen) }>
+					<button className="fullscreen-btn" onClick={() => toggleFullscreen(fullscreen) }>
 						{fullscreen && <RiFullscreenExitLine aria-hidden="true"/>}
 						{!fullscreen && <RiFullscreenFill aria-hidden="true"/>}
 					</button>
-					<Volume ToggleMute={ToggleMute} OnVolumeChange={OnVolumeChange} muted={muted} volume={volume}></Volume>
-					<div className="duration-container">
-						<div className="current-time">{videoCurrentTime}</div>
-						/
-						<div className="total-time">{videoTotalTime}</div>
-					</div>
 				</div>
 			</div>
 			<video src={ src } ref={video} onClick={togglePlayPause} onLoadedMetadata={(e) => {
-				console.log("onLoadedMetadata")
+				// console.log("onLoadedMetadata")
 				setVideoTotalTime(formatDuration(e.currentTarget.duration))
 			}} onTimeUpdate={(e) => {
-				console.log('OnTimeUpdate')
+				// console.log('OnTimeUpdate')
 				setVideoTotalTime(formatDuration(e.currentTarget.duration))
 				setVideoCurrentTime(formatDuration(e.currentTarget.currentTime))
-			}}/>
+			}}>
+				<track kind='captions' srcLang='en' src={ sub }></track>
+			</video>
 		</div>
 	)
 }
