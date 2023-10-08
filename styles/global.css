@@ -102,3 +102,30 @@ img {
 video {
 	width: 100%;
 }
+
+.volume-slider {
+	width: 0;
+	transform-origin: left;
+	transform: scaleX(0);
+	transition: width 150ms ease-in-out, transform 150ms ease-in-out;
+}
+
+.volume-container:hover .volume-slider,
+.volume-slider:focus-within {
+	width: 100px;
+	transform: scaleX(1);
+}
+
+.duration-container {
+	display: flex;
+	align-items: center;
+	gap: .25rem;
+	flex-grow: 1;
+}
+
+.duration-container {
+	display: flex; 
+	align-items: center;
+	gap: .25rem;
+	flex-grow: 1;
+}
