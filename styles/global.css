@@ -60,6 +60,7 @@ img {
 	color: white;
 	z-index: 100;
 	opacity: 0;
+	border: 0px;
 	transition: opacity 150ms ease-in-out;
 }
 
@@ -84,6 +85,7 @@ img {
 	gap: .5rem;
 	padding: .25rem;
 	align-items: center;
+	border: 0px;
 }
 
 .video-controls-container .controls button {
@@ -103,6 +105,10 @@ video {
 	width: 100%;
 }
 
+.volume-container {
+	display: flex;
+}
+
 .volume-slider {
 	width: 0;
 	transform-origin: left;
@@ -117,15 +123,27 @@ video {
 }
 
 .duration-container {
-	display: flex;
+	display: flex; 
 	align-items: center;
+	font-size: 0.85rem;
 	gap: .25rem;
 	flex-grow: 1;
 }
 
-.duration-container {
-	display: flex; 
+.video-controls-container .controls .playback-label{
+	font-size: 0.85rem;
+	height: 100%;
+	display: flex;
+	justify-content: center;
 	align-items: center;
-	gap: .25rem;
-	flex-grow: 1;
+}
+
+button {
+	display: flex;
+	align-items: center;
+}
+
+div {
+	margin: 0;
+	padding: 0;
 }

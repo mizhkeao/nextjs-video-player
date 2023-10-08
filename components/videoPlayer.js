@@ -14,6 +14,7 @@ export default function VideoPlayer({ src, sub }) {
 	const [theater, setTheater] = useState(false)
 	const [fullscreen, setFullscreen] = useState(false)
 	const [volume, setVolume] = useState(1.0)
+	const [playback, setPlayback] = useState(1.0)
 	const [muted, setMuted] = useState(false)
 	const [cc, setCC] = useState(false)
 
@@ -141,6 +142,12 @@ export default function VideoPlayer({ src, sub }) {
 		video.current.volume = e.target.value
 	}
 
+	const _setPlaybackSpeed = (e) => {
+		const newSpeed = (playback === 2.0) ? 0.5 : (playback + 0.25)
+		setPlayback(newSpeed)
+		video.current.playbackRate = newSpeed
+	}
+
 	const toggleCaptions = () => {
 		setCC(!cc)
 		if (!cc) {
@@ -169,6 +176,9 @@ export default function VideoPlayer({ src, sub }) {
 					<button className="captions-btn" onClick={ toggleCaptions }>
 						{cc && <BiSolidCaptions aria-hidden="true"/>}
 						{!cc && <BiCaptions aria-hidden="true"/>}
+					</button>
+					<button className="playback-speed-btn" onClick={_setPlaybackSpeed}>
+						<div className='playback-label'>{playback}x</div>
 					</button>
 					<button className="picture-in-picture-btn" onClick={togglePictureInPicture}>
 						{!pictureInPicture && <TbPictureInPictureOn aria-hidden="true"/>}
